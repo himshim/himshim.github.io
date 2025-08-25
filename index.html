@@ -1,0 +1,298 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My GitHub Portfolio</title>
+  <meta name="description" content="Modern, responsive portfolio pulling live data from GitHub." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b1115; --bg-soft:#0f1720; --card:#121a23; --text: #e6edf3; --muted:#9fb0c0; --brand:#7c3aed; --ring:#3b82f6;
+      --chip:#1f2937; --chipText:#cbd5e1; --border:#1e2936; --accent:#243447; --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;font-family:'Inter',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{
+      position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(11,17,21,.85),rgba(11,17,21,.65) 60%,rgba(11,17,21,0));backdrop-filter:saturate(140%) blur(12px);
+      border-bottom:1px solid var(--border)
+    }
+    .nav{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:14px 0}
+    .brand{display:flex;gap:12px;align-items:center}
+    .avatar{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);box-shadow:var(--shadow);background:#0b0}
+    .title{font-weight:700;letter-spacing:.2px}
+    .actions{display:flex;gap:10px}
+    .btn{background:var(--brand);padding:10px 14px;border-radius:12px;border:1px solid #6d28d9;box-shadow:var(--shadow);font-weight:600;display:inline-flex;gap:8px;align-items:center}
+    .btn.secondary{background:transparent;border:1px solid var(--border)}
+    .btn:focus{outline:none;box-shadow:0 0 0 3px rgba(59,130,246,.35)}.hero{display:grid;grid-template-columns:96px 1fr;gap:18px;align-items:center;padding:12px 0 22px}
+.hero .big-avatar{width:96px;height:96px;border-radius:18px;border:1px solid var(--border)}
+.tagline{color:var(--muted);margin-top:4px}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0}
+.search{flex:1;min-width:220px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;gap:8px;align-items:center}
+.search input{flex:1;background:transparent;border:none;color:var(--text);font-size:14px}
+.search input:focus{outline:none}
+.select, .toggle{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px;color:var(--text)}
+.pill{padding:8px 12px;background:var(--chip);color:var(--chipText);border-radius:999px;border:1px solid var(--border);font-size:12px}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{grid-column:span 12;background:linear-gradient(180deg,var(--card),#0d141b);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow);
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;opacity:0;transform:translateY(8px)
+}
+.card.revealed{opacity:1;transform:translateY(0)}
+@media(min-width:600px){.card{grid-column:span 6}}
+@media(min-width:980px){.card{grid-column:span 4}}
+.card:hover{transform:translateY(-2px);border-color:#2b3a4a;box-shadow:0 16px 40px rgba(0,0,0,.40)}
+.card .name{font-weight:700;display:flex;align-items:center;gap:8px}
+.card .desc{color:var(--muted);margin:8px 0 12px;min-height:40px}
+.meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chip{background:var(--chip);color:var(--chipText);border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
+.topic{background:#0e2238;border:1px solid #1f3957}
+.footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted);font-size:12px}
+.links{display:flex;gap:10px}
+.link{padding:8px 10px;border-radius:10px;background:var(--accent);border:1px solid var(--border);font-weight:600}
+.empty{padding:26px;border:1px dashed var(--border);border-radius:14px;color:var(--muted);text-align:center}
+.section-title{margin:26px 0 10px;font-size:18px;font-weight:800}
+
+.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;background:#0b1220;padding:2px 6px;border-radius:6px;border:1px solid #1e293b;color:#cbd5e1}
+
+.theme-toggle{cursor:pointer}
+.sr-only{position:absolute;left:-9999px}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <img id="navAvatar" class="avatar" alt="avatar" src=""/>
+        <div>
+          <div class="title" id="navTitle">My Portfolio</div>
+          <div style="color:var(--muted);font-size:12px">Powered by GitHub API</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="themeBtn" class="btn secondary theme-toggle" aria-label="Toggle dark mode">🌓</button>
+        <a id="ghBtn" class="btn" target="_blank" rel="noopener">View GitHub</a>
+      </div>
+    </div>
+  </header>  <main class="container">
+    <section class="hero">
+      <img id="heroAvatar" class="big-avatar" alt="avatar" src=""/>
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <h1 id="name" style="margin:0;font-size:28px"></h1>
+          <span id="hireBadge" class="pill" style="display:none">Open to work</span>
+        </div>
+        <p id="bio" class="tagline"></p>
+        <div class="meta" id="quickMeta"></div>
+      </div>
+    </section><section aria-label="Controls">
+  <div class="toolbar">
+    <div class="search" title="Tip: press / to focus search">
+      <span>🔎</span>
+      <input id="search" placeholder="Search repositories… (press /)"/>
+    </div>
+    <select id="lang" class="select" title="Filter by language">
+      <option value="">All languages</option>
+    </select>
+    <select id="sort" class="select" title="Sort repositories">
+      <option value="updated">Recently updated</option>
+      <option value="stars">Most starred</option>
+      <option value="name">Name A→Z</option>
+    </select>
+    <button id="clear" class="toggle">Reset</button>
+  </div>
+</section>
+
+<section>
+  <h2 class="section-title">Featured Projects</h2>
+  <div id="featured" class="grid"></div>
+  <div id="featuredEmpty" class="empty" style="display:none">No featured projects yet. Add some in <span class="kbd">FEATURED_PROJECTS</span>.</div>
+</section>
+
+<section>
+  <h2 class="section-title">Repositories</h2>
+  <div id="repos" class="grid"></div>
+  <div id="empty" class="empty" style="display:none">No repositories match your filters.</div>
+</section>
+
+<section style="margin:30px 0;color:var(--muted);font-size:12px">
+  <div>Data from GitHub public API (60 req/hour rate-limit without auth). Last sync: <span id="syncts">—</span></div>
+</section>
+
+  </main>  <script>
+    // === CONFIG — EDIT THESE ===
+    const GITHUB_USERNAME = "himshim"; // <- change to your GitHub username
+    // Optionally list handcrafted projects (non-repo or multi-repo). Icons: emoji allowed.
+    const FEATURED_PROJECTS = [
+      // Example:
+      // { title:"Lab Graph Maker", tagline:"Turn manual instrument readings into publication-grade graphs.", href:"https://your-demo-link.example", repo:"your-username/lab-graph-maker", badges:["Web App","Charts","Hobby"],
+      //   preview:"", note:"Built with vanilla JS" }
+    ];
+    // ==========================
+
+    const state = { repos:[], languages:new Set(), filterLang:"", search:"", sort:"updated" };
+
+    const $ = sel => document.querySelector(sel);
+    const el = (tag, cls) => { const x = document.createElement(tag); if(cls) x.className = cls; return x; }
+    const fmt = new Intl.DateTimeFormat(undefined,{dateStyle:'medium'});
+
+    function setTheme(next){
+      const cur = localStorage.getItem('theme') || 'dark';
+      const computed = next || cur;
+      document.documentElement.dataset.theme = computed;
+      localStorage.setItem('theme', computed);
+      $('#themeBtn').textContent = computed === 'dark' ? '☀️' : '🌙';
+    }
+
+    function toggleTheme(){
+      const cur = localStorage.getItem('theme') || 'dark';
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    }
+
+    async function fetchJSON(url){
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('HTTP '+res.status+' for '+url);
+      return res.json();
+    }
+
+    function revealObserve(cards){
+      const io = new IntersectionObserver((entries)=>{
+        for(const e of entries){ if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target);} }
+      },{threshold:.08});
+      cards.forEach(c=>io.observe(c));
+    }
+
+    function buildLangOptions(){
+      const langSel = $('#lang');
+      [...state.languages].sort((a,b)=>a.localeCompare(b)).forEach(l=>{
+        const o = el('option'); o.value = l; o.textContent = l; langSel.appendChild(o);
+      });
+    }
+
+    function repoCard(r){
+      const c = el('article','card');
+      const name = el('div','name');
+      const lock = r.private ? '🔒' : '📦';
+      name.innerHTML = `${lock} <a class="linkless" href="${r.html_url}" target="_blank" rel="noopener">${r.name}</a>`;
+      const desc = el('div','desc'); desc.textContent = r.description || 'No description.';
+
+      const meta = el('div','meta');
+      if(r.language){ const m = el('span','chip'); m.textContent = r.language; meta.appendChild(m); }
+      const s = el('span','chip'); s.textContent = `★ ${r.stargazers_count}`; meta.appendChild(s);
+      const f = el('span','chip'); f.textContent = `⑂ ${r.forks_count}`; meta.appendChild(f);
+      if(r.topics){ r.topics.slice(0,4).forEach(t=>{ const tEl = el('span','chip topic'); tEl.textContent = t; meta.appendChild(tEl); }); }
+
+      const foot = el('div','footer');
+      const updated = el('div'); updated.textContent = `Updated ${fmt.format(new Date(r.updated_at))}`;
+      const links = el('div','links');
+      const code = el('a','link'); code.href = r.html_url; code.target = '_blank'; code.textContent = 'Code'; links.appendChild(code);
+      if(r.homepage){ const demo = el('a','link'); demo.href = r.homepage; demo.target = '_blank'; demo.textContent = 'Demo'; links.appendChild(demo); }
+
+      c.append(name, desc, meta, foot);
+      foot.append(updated, links);
+      return c;
+    }
+
+    function featuredCard(p){
+      const c = el('article','card');
+      const name = el('div','name'); name.textContent = p.title;
+      const desc = el('div','desc'); desc.textContent = p.tagline || '';
+      const meta = el('div','meta');
+      (p.badges||[]).forEach(b=>{ const x = el('span','chip'); x.textContent = b; meta.appendChild(x); });
+      const foot = el('div','footer');
+      const links = el('div','links');
+      if(p.href){ const live = el('a','link'); live.href = p.href; live.target = '_blank'; live.textContent = 'Live'; links.appendChild(live); }
+      if(p.repo){ const code = el('a','link'); code.href = 'https://github.com/'+p.repo; code.target = '_blank'; code.textContent = 'Code'; links.appendChild(code); }
+      foot.append(el('div'), links);
+      c.append(name,desc,meta,foot);
+      return c;
+    }
+
+    function render(){
+      const q = state.search.toLowerCase();
+      let list = state.repos.filter(r=>!r.archived);
+      if(state.filterLang) list = list.filter(r=>r.language===state.filterLang);
+      if(q) list = list.filter(r=> (r.name+" "+(r.description||"" )+" "+(r.topics||[]).join(" ")).toLowerCase().includes(q));
+
+      if(state.sort==='updated') list.sort((a,b)=> new Date(b.updated_at)-new Date(a.updated_at));
+      if(state.sort==='stars') list.sort((a,b)=> b.stargazers_count - a.stargazers_count);
+      if(state.sort==='name') list.sort((a,b)=> a.name.localeCompare(b.name));
+
+      const wrap = $('#repos'); wrap.innerHTML = '';
+      const cards = list.map(repoCard);
+      cards.forEach(c=>wrap.appendChild(c));
+      $('#empty').style.display = cards.length? 'none':'block';
+      revealObserve(cards);
+    }
+
+    function renderFeatured(){
+      const wrap = $('#featured'); wrap.innerHTML='';
+      if(!FEATURED_PROJECTS.length){ $('#featuredEmpty').style.display='block'; return; }
+      $('#featuredEmpty').style.display='none';
+      const cards = FEATURED_PROJECTS.map(featuredCard);
+      cards.forEach(c=>wrap.appendChild(c));
+      revealObserve(cards);
+    }
+
+    async function load(){
+      // User profile
+      const user = await fetchJSON(`https://api.github.com/users/${GITHUB_USERNAME}`);
+      $('#navAvatar').src = `https://github.com/${GITHUB_USERNAME}.png`;
+      $('#heroAvatar').src = `https://github.com/${GITHUB_USERNAME}.png`;
+      $('#navTitle').textContent = user.login + ' · Portfolio';
+      $('#name').textContent = user.name || user.login;
+      $('#bio').textContent = user.bio || '';
+      $('#ghBtn').href = user.html_url;
+      if(user.hireable) $('#hireBadge').style.display='inline-flex';
+
+      const qm = $('#quickMeta');
+      qm.innerHTML = '';
+      const loc = user.location ? `📍 ${user.location}`:'';
+      const fol = `👥 ${user.followers} followers`;
+      const pub = `📦 ${user.public_repos} public repos`;
+      [loc, fol, pub].filter(Boolean).forEach(t=>{ const x = el('span','pill'); x.textContent = t; qm.appendChild(x); });
+
+      // Repositories (first 100 owner repos)
+      const repos = await fetchJSON(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&type=owner&sort=updated&direction=desc`);
+      state.repos = repos;
+      state.languages = new Set(repos.filter(r=>r.language).map(r=>r.language));
+      buildLangOptions();
+      render();
+
+      // Optional: topics for each repo (requires Accept header). We'll fetch lazily to avoid rate limits.
+      // Enrich topics:
+      for(const r of state.repos){
+        try{
+          const res = await fetch(r.url,{ headers: { 'Accept':'application/vnd.github.mercy-preview+json' }});
+          if(res.ok){ const full = await res.json(); r.topics = full.topics || []; }
+        }catch{} // ignore
+      }
+      render();
+
+      $('#syncts').textContent = fmt.format(new Date());
+    }
+
+    // Events
+    $('#themeBtn').addEventListener('click', toggleTheme);
+    setTheme(localStorage.getItem('theme')||'dark');
+
+    $('#search').addEventListener('input', e=>{ state.search = e.target.value; render(); });
+    document.addEventListener('keydown', e=>{ if(e.key==='/' && document.activeElement.tagName!=='INPUT'){ e.preventDefault(); $('#search').focus(); }});
+    $('#lang').addEventListener('change', e=>{ state.filterLang = e.target.value; render(); });
+    $('#sort').addEventListener('change', e=>{ state.sort = e.target.value; render(); });
+    $('#clear').addEventListener('click',()=>{ state.search=''; state.filterLang=''; state.sort='updated'; $('#search').value=''; $('#lang').value=''; $('#sort').value='updated'; render(); });
+
+    renderFeatured();
+    load().catch(err=>{
+      console.error(err);
+      $('#repos').innerHTML = '';
+      $('#empty').style.display='block';
+      $('#empty').textContent = 'Failed to load from GitHub. Check your username or try again later.';
+    });
+  </script></body>
+</html>
