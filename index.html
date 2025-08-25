@@ -249,4 +249,69 @@
       const wrap = $('#repos'); wrap.innerHTML = '';
       const cards = list.map(repoCard);
       cards.forEach(c=>wrap.appendChild(c));
-      $('#empty
+      $('#empty').style.display = cards.length? 'none':'block';
+      revealObserve(cards);
+    }
+
+    function renderFeatured(){
+      const wrap = $('#featured'); wrap.innerHTML='';
+      if(!FEATURED_PROJECTS.length){ $('#featuredEmpty').style.display='block'; return; }
+      $('#featuredEmpty').style.display='none';
+      const cards = FEATURED_PROJECTS.map(featuredCard);
+      cards.forEach(c=>wrap.appendChild(c));
+      revealObserve(cards);
+    }
+
+    async function load(){
+      // User profile
+      const user = await fetchJSON(`https://api.github.com/users/${GITHUB_USERNAME}`);
+      $('#navAvatar').src = `https://github.com/${GITHUB_USERNAME}.png`;
+      $('#heroAvatar').src = `https://github.com/${GITHUB_USERNAME}.png`;
+      $('#navTitle').textContent = user.login + ' · Portfolio';
+      $('#name').textContent = user.name || user.login;
+      $('#bio').textContent = user.bio || '';
+      $('#ghBtn').href = user.html_url;
+      if(user.hireable) $('#hireBadge').style.display='inline-flex';
+
+      const qm = $('#quickMeta');
+      qm.innerHTML = '';
+      const loc = user.location ? `📍 ${user.location}`:'';
+      const fol = `👥 ${user.followers} followers`;
+      const pub = `📦 ${user.public_repos} public repos`;
+      [loc, fol, pub].filter(Boolean).forEach(t=>{ const x = el('span','pill'); x.textContent = t; qm.appendChild(x); });
+
+      // Repositories (first 100 owner repos)
+      const repos = await fetchJSON(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&type=owner&sort=updated&direction=desc`);
+      state.repos = repos;
+      state.languages = new Set(repos.filter(r=>r.language).map(r=>r.language));
+      buildLangOptions();
+      render();
+
+      // Disabled topics enrichment to avoid hitting the 60/hr rate limit from browsers.
+      // If you want topics later, enable only for a few repos, e.g. state.repos.slice(0, 8)
+      // and use the Accept header 'application/vnd.github+json'.
+      render();
+
+      $('#syncts').textContent = fmt.format(new Date());
+    }
+
+    // Events
+    $('#themeBtn').addEventListener('click', toggleTheme);
+    setTheme(localStorage.getItem('theme')||'dark');
+
+    $('#search').addEventListener('input', e=>{ state.search = e.target.value; render(); });
+    document.addEventListener('keydown', e=>{ if(e.key==='/' && document.activeElement.tagName!=='INPUT'){ e.preventDefault(); $('#search').focus(); }});
+    $('#lang').addEventListener('change', e=>{ state.filterLang = e.target.value; render(); });
+    $('#sort').addEventListener('change', e=>{ state.sort = e.target.value; render(); });
+    $('#clear').addEventListener('click',()=>{ state.search=''; state.filterLang=''; state.sort='updated'; $('#search').value=''; $('#lang').value=''; $('#sort').value='updated'; render(); });
+
+    renderFeatured();
+    load().catch(err=>{
+      console.error(err);
+      const msg = (err && err.message) ? String(err.message) : 'Unknown error';
+      $('#repos').innerHTML = '';
+      $('#empty').style.display='block';
+      $('#empty').textContent = 'Failed to load from GitHub (' + msg + '). You may be rate-limited. Try again later.';
+    });
+  </script></body>
+</html>
