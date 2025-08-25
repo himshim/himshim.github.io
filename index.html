@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My GitHub Portfolio</title>
+  <title>Himshim — GitHub Portfolio</title>
   <meta name="description" content="Modern, responsive portfolio pulling live data from GitHub." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -126,12 +126,24 @@
 
   </main>  <script>
     // === CONFIG — EDIT THESE ===
-    const GITHUB_USERNAME = "your-username"; // <- change to your GitHub username
-    // Optionally list handcrafted projects (non-repo or multi-repo). Icons: emoji allowed.
+    const GITHUB_USERNAME = "himshim"; // <- your GitHub username
+
+    // Handpicked projects (non-repo or multi-repo allowed). Leave href empty if there's no live demo.
     const FEATURED_PROJECTS = [
-      // Example:
-      // { title:"Lab Graph Maker", tagline:"Turn manual instrument readings into publication-grade graphs.", href:"https://your-demo-link.example", repo:"your-username/lab-graph-maker", badges:["Web App","Charts","Hobby"],
-      //   preview:"", note:"Built with vanilla JS" }
+      {
+        title: "Bandwidth Hero Proxy 2",
+        tagline: "Compression proxy for saving data when browsing.",
+        // No live demo, show only Code
+        repo: "himshim/bandwidth-hero-proxy2",
+        badges: ["Node.js", "Proxy", "Utilities"]
+      },
+      {
+        title: "Bandwidth Hero MV3",
+        tagline: "Chrome/Edge extension using Manifest V3 to compress images.",
+        // No live demo, show only Code
+        repo: "himshim/Bandwidth-hero-mv3",
+        badges: ["Browser Extension", "MV3", "Performance"]
+      }
     ];
     // ==========================
 
