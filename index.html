@@ -62,6 +62,9 @@
 .theme-toggle{cursor:pointer}
 .sr-only{position:absolute;left:-9999px}
 
+.social{display:flex;gap:12px;margin-top:12px}
+.social a{padding:8px 10px;border-radius:10px;background:var(--accent);border:1px solid var(--border);font-size:14px;font-weight:600}
+
   </style>
 </head>
 <body>
@@ -89,6 +92,11 @@
         </div>
         <p id="bio" class="tagline"></p>
         <div class="meta" id="quickMeta"></div>
+        <div class="social">
+          <a href="https://instagram.com/himshim26" target="_blank">Instagram</a>
+          <a href="https://twitter.com/himshim26" target="_blank">Twitter</a>
+          <a href="https://www.threads.net/@himshim26" target="_blank">Threads</a>
+        </div>
       </div>
     </section><section aria-label="Controls">
   <div class="toolbar">
@@ -128,21 +136,24 @@
     // === CONFIG — EDIT THESE ===
     const GITHUB_USERNAME = "himshim"; // <- your GitHub username
 
-    // Handpicked projects (non-repo or multi-repo allowed). Leave href empty if there's no live demo.
     const FEATURED_PROJECTS = [
       {
         title: "Bandwidth Hero Proxy 2",
         tagline: "Compression proxy for saving data when browsing.",
-        // No live demo, show only Code
         repo: "himshim/bandwidth-hero-proxy2",
         badges: ["Node.js", "Proxy", "Utilities"]
       },
       {
         title: "Bandwidth Hero MV3",
         tagline: "Chrome/Edge extension using Manifest V3 to compress images.",
-        // No live demo, show only Code
         repo: "himshim/Bandwidth-hero-mv3",
         badges: ["Browser Extension", "MV3", "Performance"]
+      },
+      {
+        title: "Pharmagraph Lab",
+        tagline: "Generate clean graphs from pharmacy instrument readings.",
+        repo: "himshim/Pharmagraph-lab",
+        badges: ["Web App", "Pharmacy", "Graphs"]
       }
     ];
     // ==========================
@@ -238,73 +249,4 @@
       const wrap = $('#repos'); wrap.innerHTML = '';
       const cards = list.map(repoCard);
       cards.forEach(c=>wrap.appendChild(c));
-      $('#empty').style.display = cards.length? 'none':'block';
-      revealObserve(cards);
-    }
-
-    function renderFeatured(){
-      const wrap = $('#featured'); wrap.innerHTML='';
-      if(!FEATURED_PROJECTS.length){ $('#featuredEmpty').style.display='block'; return; }
-      $('#featuredEmpty').style.display='none';
-      const cards = FEATURED_PROJECTS.map(featuredCard);
-      cards.forEach(c=>wrap.appendChild(c));
-      revealObserve(cards);
-    }
-
-    async function load(){
-      // User profile
-      const user = await fetchJSON(`https://api.github.com/users/${GITHUB_USERNAME}`);
-      $('#navAvatar').src = `https://github.com/${GITHUB_USERNAME}.png`;
-      $('#heroAvatar').src = `https://github.com/${GITHUB_USERNAME}.png`;
-      $('#navTitle').textContent = user.login + ' · Portfolio';
-      $('#name').textContent = user.name || user.login;
-      $('#bio').textContent = user.bio || '';
-      $('#ghBtn').href = user.html_url;
-      if(user.hireable) $('#hireBadge').style.display='inline-flex';
-
-      const qm = $('#quickMeta');
-      qm.innerHTML = '';
-      const loc = user.location ? `📍 ${user.location}`:'';
-      const fol = `👥 ${user.followers} followers`;
-      const pub = `📦 ${user.public_repos} public repos`;
-      [loc, fol, pub].filter(Boolean).forEach(t=>{ const x = el('span','pill'); x.textContent = t; qm.appendChild(x); });
-
-      // Repositories (first 100 owner repos)
-      const repos = await fetchJSON(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&type=owner&sort=updated&direction=desc`);
-      state.repos = repos;
-      state.languages = new Set(repos.filter(r=>r.language).map(r=>r.language));
-      buildLangOptions();
-      render();
-
-      // Optional: topics for each repo (requires Accept header). We'll fetch lazily to avoid rate limits.
-      // Enrich topics:
-      for(const r of state.repos){
-        try{
-          const res = await fetch(r.url,{ headers: { 'Accept':'application/vnd.github.mercy-preview+json' }});
-          if(res.ok){ const full = await res.json(); r.topics = full.topics || []; }
-        }catch{} // ignore
-      }
-      render();
-
-      $('#syncts').textContent = fmt.format(new Date());
-    }
-
-    // Events
-    $('#themeBtn').addEventListener('click', toggleTheme);
-    setTheme(localStorage.getItem('theme')||'dark');
-
-    $('#search').addEventListener('input', e=>{ state.search = e.target.value; render(); });
-    document.addEventListener('keydown', e=>{ if(e.key==='/' && document.activeElement.tagName!=='INPUT'){ e.preventDefault(); $('#search').focus(); }});
-    $('#lang').addEventListener('change', e=>{ state.filterLang = e.target.value; render(); });
-    $('#sort').addEventListener('change', e=>{ state.sort = e.target.value; render(); });
-    $('#clear').addEventListener('click',()=>{ state.search=''; state.filterLang=''; state.sort='updated'; $('#search').value=''; $('#lang').value=''; $('#sort').value='updated'; render(); });
-
-    renderFeatured();
-    load().catch(err=>{
-      console.error(err);
-      $('#repos').innerHTML = '';
-      $('#empty').style.display='block';
-      $('#empty').textContent = 'Failed to load from GitHub. Check your username or try again later.';
-    });
-  </script></body>
-</html>
+      $('#empty
